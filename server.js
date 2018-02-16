@@ -14,21 +14,14 @@ var hasOwnProperty = Object.prototype.hasOwnProperty;
 router.get('/api/phonenumbers/parse/text/:number', (req, res) => {
 	var list = [];
 	try {
-		var num = req.params.number.toString().replace(/\D/g, '');;
-		if (num.length > 11 || num.length < 10) {
+		var num = req.params.number.toString().replace(/\D/g, '');;		
+		if (num.length < 10 || num.length >= 11 && !(num.toString().charAt(0) == "1" && num.length == 11)) {
 			res.status(400).send('Phone Number not recognize, please try again.');
 		}
-		else {
-			var temp = "";
-			temp = num.toString();
-			if((temp.charAt(0) == "1" && num.length == 11) || num.length == 10){
+		else {			
 				var phoneNumber = phoneUtil.parse(num, 'CA');
 				list.push(phoneUtil.format(phoneNumber, PNF.INTERNATIONAL));
 				res.status(200).send(list);
-			}
-			else{
-				res.status(400).send('Phone Number not recognize, please try again.');
-			}
 		}
 	}
 	catch (err) {
@@ -66,7 +59,6 @@ app.post('/api/phoneNumbers/parse/file', function (req, res) {
 			callback(null, true)
 		}
 	}).single('userFile');
-	console.log("working");
 	upload(req, res, function (err) {
 		var buffer = fs.readFileSync(req.file.path);
 		buffer.toString().split(/\n/).forEach(function (line) {
